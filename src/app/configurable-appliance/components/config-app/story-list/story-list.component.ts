@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 })
 export class StoryList implements OnInit {
     storyList: any[] = [];
+     filteredStoryList: any[] = [];
     @ViewChild('dt') dataTable: Table;
     loading: boolean = false;
     messages: Message[] = [];
@@ -34,6 +35,7 @@ export class StoryList implements OnInit {
         this.contentService.getStoriesList().subscribe(
             (response: any) => {
                 if (response.status === 'success') {
+                    this.filteredStoryList = this.storyList.slice();
                     this.storyList = response.data;
                     this.loading = false;
                 }
@@ -168,10 +170,23 @@ export class StoryList implements OnInit {
         });
     }
 
+
+    filterStories(event: any) {
+        const searchText = event.target.value.toLowerCase();
+        this.filteredStoryList = this.storyList.filter(story =>
+            story.title.toLowerCase().includes(searchText) ||
+            story.author.toLowerCase().includes(searchText) ||
+            story.date.toLowerCase().includes(searchText)
+        );
+    }
+
+    resetSearch() {
+        this.filteredStoryList = this.storyList.slice();
+    }
+
     clear(table: Table) {
         table.dataTable.clear();
     }
-
     openWordList(collectionId: string) {
         this.router.navigate(['/content/word-sentence/list'], { queryParams: { collectionId } });
     }
